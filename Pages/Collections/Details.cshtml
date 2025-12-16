@@ -1,0 +1,40 @@
+﻿@page
+@model Azure_SearchProject.Pages.Collections.DetailsModel
+
+@if (Model.Collection == null)
+{
+    <p>Not found.</p>
+    return;
+}
+
+<h2>@Model.Collection.Name</h2>
+<p>@(Model.Collection.IsPublic ? "Public" : "Private")</p>
+
+@if (Model.CanEdit)
+{
+    <form method="post" asp-page-handler="ToggleVisibility">
+        <input type="hidden" name="id" value="@Model.Collection.Id" />
+        <button type="submit">Make @(Model.Collection.IsPublic ? "Private" : "Public")</button>
+    </form>
+}
+
+<hr />
+
+<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:12px;">
+@foreach (var img in Model.Images)
+{
+    <div>
+        <a href="/Images/Details?id=@img.Id">
+            <img src="@img.BlobUrl" style="width:100%; height:160px; object-fit:cover; border-radius:8px;" />
+        </a>
+        @if (Model.CanEdit)
+        {
+            <form method="post" asp-page-handler="RemoveImage">
+                <input type="hidden" name="id" value="@Model.Collection.Id" />
+                <input type="hidden" name="imageId" value="@img.Id" />
+                <button type="submit">Remove</button>
+            </form>
+        }
+    </div>
+}
+</div>

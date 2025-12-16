@@ -1,0 +1,31 @@
+﻿@page
+@model Azure_SearchProject.Pages.Images.UploadModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+<h2>Upload image</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <div>
+        <label>File</label>
+        <input type="file" name="File" accept="image/*" required />
+    </div>
+    <div>
+        <label>Title</label>
+        <input type="text" name="Title" />
+    </div>
+    <div>
+        <label>Tags (comma separated)</label>
+        <input type="text" name="Tags" placeholder="nature, city, tech" />
+    </div>
+    <div>
+        <label>Public</label>
+        <input type="checkbox" name="IsPublic" checked />
+    </div>
+
+    <button type="submit">Upload</button>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <p>@Model.Message</p>
+}

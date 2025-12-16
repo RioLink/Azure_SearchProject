@@ -1,0 +1,65 @@
+﻿@page
+@model Azure_SearchProject.Pages.Images.DetailsModel
+
+<h2>@(Model.Image?.Title ?? "Image")</h2>
+
+@if (Model.Image == null)
+{
+    <p>Not found.</p>
+    return;
+}
+
+<img src="@Model.Image.BlobUrl" style="max-width: 720px; width:100%; border-radius:12px;" />
+
+<p>
+    Tags:
+    @foreach (var t in Model.Tags)
+    {
+        <span style="padding:3px 8px; border:1px solid #ccc; border-radius:12px; margin-right:6px;">@t</span>
+    }
+</p>
+
+<p>
+    Likes: <b>@Model.LikeCount</b>
+</p>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <form method="post" asp-page-handler="ToggleLike">
+        <input type="hidden" name="id" value="@Model.Image.Id" />
+        <button type="submit">@(Model.UserLiked ? "Unlike" : "Like")</button>
+    </form>
+
+    <hr />
+
+    <h3>Add to collection</h3>
+    <form method="post" asp-page-handler="AddToCollection">
+        <input type="hidden" name="id" value="@Model.Image.Id" />
+        <select name="collectionId">
+            @foreach (var c in Model.MyCollections)
+            {
+                <option value="@c.Id">@c.Name</option>
+            }
+        </select>
+        <button type="submit">Add</button>
+    </form>
+
+    <hr />
+
+    <h3>Comment</h3>
+    <form method="post" asp-page-handler="AddComment">
+        <input type="hidden" name="id" value="@Model.Image.Id" />
+        <textarea name="text" rows="3" style="width:100%;" maxlength="500" required></textarea>
+        <button type="submit">Send</button>
+    </form>
+}
+
+<hr />
+<h3>Comments</h3>
+@foreach (var c in Model.Comments)
+{
+    <div style="border-top:1px solid #eee; padding:10px 0;">
+        <div><b>@c.UserId</b> · @c.CreatedAt.ToLocalTime()</div>
+        <div>@c.Text</div>
+    </div>
+}

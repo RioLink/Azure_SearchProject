@@ -1,0 +1,23 @@
+﻿@page
+@model Azure_SearchProject.Pages.Images.SearchModel
+
+<h2>Search</h2>
+
+<form method="get">
+    <input type="text" name="q" value="@Model.Q" placeholder="keywords or tags..." />
+    <button type="submit">Search</button>
+</form>
+
+@if (Model.Results?.Any() == true)
+{
+    <hr />
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:12px;">
+        @foreach (var img in Model.Results)
+        {
+            <a href="/Images/Details?id=@img.Id" style="text-decoration:none;">
+                <img src="@img.BlobUrl" style="width:100%; height:160px; object-fit:cover; border-radius:8px;" />
+                <div>@(img.Title ?? "Untitled")</div>
+            </a>
+        }
+    </div>
+}

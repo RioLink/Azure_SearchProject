@@ -1,0 +1,40 @@
+﻿@page
+@model Azure_SearchProject.Pages.Admin.ModerationModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+
+<h2>Admin Moderation</h2>
+
+<h3>Images</h3>
+
+<table>
+    <tr><th>Id</th><th>Preview</th><th>Status</th><th>Actions</th></tr>
+@foreach (var img in Model.Images)
+{
+    <tr>
+        <td>@img.Id</td>
+        <td><img src="@img.BlobUrl" style="width:120px; height:80px; object-fit:cover;" /></td>
+        <td>@img.SafetyStatus</td>
+        <td>
+            <form method="post" asp-page-handler="SetStatus" style="display:inline;">
+                <input type="hidden" name="id" value="@img.Id" />
+                <input type="hidden" name="status" value="Approved" />
+                <button type="submit">Approve</button>
+            </form>
+            <form method="post" asp-page-handler="SetStatus" style="display:inline;">
+                <input type="hidden" name="id" value="@img.Id" />
+                <input type="hidden" name="status" value="Rejected" />
+                <button type="submit">Reject</button>
+            </form>
+        </td>
+    </tr>
+}
+</table>
+
+<hr />
+
+<h3>Users (lockout)</h3>
+<form method="post" asp-page-handler="LockUser">
+    <input name="email" placeholder="user email" required />
+    <input name="minutes" type="number" value="60" min="1" />
+    <button type="submit">Lock</button>
+</form>

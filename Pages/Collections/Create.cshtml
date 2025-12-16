@@ -1,0 +1,17 @@
+﻿@page
+@model Azure_SearchProject.Pages.Collections.CreateModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+<h2>Create collection</h2>
+
+<form method="post">
+    <div>
+        <label>Name</label>
+        <input asp-for="Name" maxlength="80" required />
+    </div>
+    <div>
+        <label>Public</label>
+        <input asp-for="IsPublic" type="checkbox" />
+    </div>
+    <button type="submit">Create</button>
+</form>
