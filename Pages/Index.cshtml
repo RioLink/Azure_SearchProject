@@ -1,10 +1,41 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero">
+    <h1>🔍 Search images</h1>
+
+    <form method="get" asp-page="/Images/Search" class="search-form">
+        <input name="q" placeholder="Search by tags..." />
+        <button type="submit">Search</button>
+    </form>
+</section>
+
+<section>
+    <h2>🔥 Trending</h2>
+    <partial name="_ImageGrid" model="Model.Vm.Trending" />
+</section>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <section>
+        <h2>⭐ Recommended for you</h2>
+        <partial name="_ImageGrid" model="Model.Vm.Recommended" />
+    </section>
+}
+
+<section>
+    <h2>🏷 Popular tags</h2>
+    <div class="tags">
+        @foreach (var tag in Model.Vm.PopularTags)
+        {
+            <a class="tag"
+               asp-page="/Images/Search"
+               asp-route-q="@tag.Name">
+                #@tag.Name
+            </a>
+        }
+    </div>
+</section>

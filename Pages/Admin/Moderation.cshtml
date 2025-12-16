@@ -1,33 +1,71 @@
 ﻿@page
 @model Azure_SearchProject.Pages.Admin.ModerationModel
-@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "AdminOnly")]
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Policy = "AdminOnly")]
 
 <h2>Admin Moderation</h2>
 
-<h3>Images</h3>
+<h3>Filter</h3>
+<a asp-page="./Moderation" asp-route-status="Pending">Pending</a> |
+<a asp-page="./Moderation" asp-route-status="Approved">Approved</a> |
+<a asp-page="./Moderation" asp-route-status="Rejected">Rejected</a>
+
+<hr />
 
 <table>
-    <tr><th>Id</th><th>Preview</th><th>Status</th><th>Actions</th></tr>
-@foreach (var img in Model.Images)
-{
     <tr>
-        <td>@img.Id</td>
-        <td><img src="@img.BlobUrl" style="width:120px; height:80px; object-fit:cover;" /></td>
-        <td>@img.SafetyStatus</td>
-        <td>
-            <form method="post" asp-page-handler="SetStatus" style="display:inline;">
-                <input type="hidden" name="id" value="@img.Id" />
-                <input type="hidden" name="status" value="Approved" />
-                <button type="submit">Approve</button>
-            </form>
-            <form method="post" asp-page-handler="SetStatus" style="display:inline;">
-                <input type="hidden" name="id" value="@img.Id" />
-                <input type="hidden" name="status" value="Rejected" />
-                <button type="submit">Reject</button>
-            </form>
-        </td>
+        <th>Id</th>
+        <th>Preview</th>
+        <th>Status</th>
+        <th>Actions</th>
     </tr>
-}
+
+    @foreach (var img in Model.Images)
+    {
+        <tr>
+            <td>@img.Id</td>
+            <td>
+                <img src="@img.BlobUrl" style="width:120px;height:80px;object-fit:cover;" />
+            </td>
+
+            <td>
+                @if (img.SafetyStatus == "Approved")
+                {
+                    <span style="color:green;font-weight:bold;">✔ Approved</span>
+                }
+                else if (img.SafetyStatus == "Rejected")
+                {
+                    <span style="color:red;font-weight:bold;">✖ Rejected</span>
+                }
+                else
+                {
+                    <span style="color:orange;font-weight:bold;">⏳ Pending</span>
+                }
+            </td>
+
+            <td>
+                @if (img.SafetyStatus == "Pending")
+                {
+                    <form method="post" asp-page-handler="SetStatus" style="display:inline;">
+                        <input type="hidden" name="id" value="@img.Id" />
+                        <input type="hidden" name="status" value="Approved" />
+                        <button>Approve</button>
+                    </form>
+
+                    <form method="post" asp-page-handler="SetStatus" style="display:inline;">
+                        <input type="hidden" name="id" value="@img.Id" />
+                        <input type="hidden" name="status" value="Rejected" />
+                        <button>Reject</button>
+                    </form>
+                }
+
+                <form method="post" asp-page-handler="SoftDelete" style="display:inline;">
+                    <input type="hidden" name="id" value="@img.Id" />
+                    <button style="color:red;">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
 </table>
 
 <hr />
@@ -36,5 +74,5 @@
 <form method="post" asp-page-handler="LockUser">
     <input name="email" placeholder="user email" required />
     <input name="minutes" type="number" value="60" min="1" />
-    <button type="submit">Lock</button>
+    <button>Lock</button>
 </form>

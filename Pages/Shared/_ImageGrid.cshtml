@@ -1,0 +1,22 @@
+﻿@using Azure_SearchProject.Models
+@model List<ImageItem>
+
+@if (Model?.Any() == true)
+{
+    <div class="grid">
+        @foreach (var img in Model)
+        {
+            <a asp-page="/Images/Details" asp-route-id="@img.Id" class="card">
+                <img src="@img.BlobUrl" alt="@img.Title" />
+                <div class="card-info">
+                    <div class="title">@img.Title</div>
+                    <div class="likes">❤️ @img.Likes.Count</div>
+                </div>
+            </a>
+        }
+    </div>
+}
+else
+{
+    <p class="muted">No images found.</p>
+}

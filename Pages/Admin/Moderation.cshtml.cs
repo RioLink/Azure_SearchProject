@@ -22,10 +22,13 @@ public class ModerationModel : PageModel
 
     public List<ImageItem> Images { get; set; } = new();
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(string? status)
     {
+        status ??= "Pending";
+
         Images = await _db.Images
             .AsNoTracking()
+            .Where(i => !i.IsDeleted && i.SafetyStatus == status)
             .OrderByDescending(i => i.CreatedAt)
             .Take(50)
             .ToListAsync();
@@ -33,14 +36,26 @@ public class ModerationModel : PageModel
 
     public async Task<IActionResult> OnPostSetStatusAsync(int id, string status)
     {
+        if (status is not ("Approved" or "Rejected" or "Pending"))
+            return BadRequest();
+
         var img = await _db.Images.FirstOrDefaultAsync(i => i.Id == id);
         if (img == null) return NotFound();
 
-        if (status != "Approved" && status != "Rejected" && status != "Pending")
-            return BadRequest();
-
         img.SafetyStatus = status;
         await _db.SaveChangesAsync();
+
+        return RedirectToPage(new { status });
+    }
+
+    public async Task<IActionResult> OnPostSoftDeleteAsync(int id)
+    {
+        var img = await _db.Images.FirstOrDefaultAsync(i => i.Id == id);
+        if (img == null) return NotFound();
+
+        img.IsDeleted = true;
+        await _db.SaveChangesAsync();
+
         return RedirectToPage();
     }
 

@@ -23,7 +23,7 @@ public class UploadModel : PageModel
         _moderation = moderation;
     }
 
-    [BindProperty] public IFormFile File { get; set; } = default!;
+    [BindProperty] public IFormFile UploadFile { get; set; } = null!;
     [BindProperty] public string? Title { get; set; }
     [BindProperty] public string? Tags { get; set; }
     [BindProperty] public bool IsPublic { get; set; } = true;
@@ -34,15 +34,29 @@ public class UploadModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (File == null || File.Length == 0) { Message = "No file."; return Page(); }
-        if (!File.ContentType.StartsWith("image/")) { Message = "Only images allowed."; return Page(); }
-        if (File.Length > 5 * 1024 * 1024) { Message = "Max 5MB."; return Page(); }
+        if (UploadFile == null || UploadFile.Length == 0)
+        {
+            Message = "No file.";
+            return Page();
+        }
+
+        if (!UploadFile.ContentType.StartsWith("image/"))
+        {
+            Message = "Only images allowed.";
+            return Page();
+        }
+
+        if (UploadFile.Length > 5 * 1024 * 1024)
+        {
+            Message = "Max 5MB.";
+            return Page();
+        }
 
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return Challenge();
 
         await using var ms = new MemoryStream();
-        await File.CopyToAsync(ms);
+        await UploadFile.CopyToAsync(ms);
         ms.Position = 0;
 
         var mod = await _moderation.CheckAsync(ms);
@@ -53,7 +67,7 @@ public class UploadModel : PageModel
         }
 
         ms.Position = 0;
-        var url = await _blob.UploadImageAsync(ms, File.ContentType, File.FileName);
+        var url = await _blob.UploadImageAsync(ms, UploadFile.ContentType, UploadFile.FileName);
 
         var img = new ImageItem
         {
@@ -80,7 +94,6 @@ public class UploadModel : PageModel
         _db.Images.Add(img);
         await _db.SaveChangesAsync();
 
-        Message = "Uploaded!";
         return RedirectToPage("/Images/Details", new { id = img.Id });
     }
 }

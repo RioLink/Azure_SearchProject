@@ -1,4 +1,4 @@
-using Azure_SearchProject.Data;
+﻿using Azure_SearchProject.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,27 +27,43 @@ public class IndexModel : PageModel
     {
         var user = await _userManager.GetUserAsync(User);
 
-        MyCollections = await _db.Collections
-            .AsNoTracking()
-            .Where(c => c.OwnerId == user!.Id)
-            .OrderByDescending(c => c.CreatedAt)
-            .ToListAsync();
-
         var publics = await _db.Collections
             .AsNoTracking()
-            .Where(c => c.IsPublic && c.OwnerId != user!.Id)
+            .Where(c => c.IsPublic && (user == null || c.OwnerId != user.Id))
             .OrderByDescending(c => c.CreatedAt)
             .Take(50)
             .ToListAsync();
 
-        var followedIds = await _db.CollectionFollows
-            .AsNoTracking()
-            .Where(f => f.UserId == user!.Id)
-            .Select(f => f.CollectionId)
-            .ToListAsync();
+        if (user != null)
+        {
+            MyCollections = await _db.Collections
+                .AsNoTracking()
+                .Where(c => c.OwnerId == user.Id)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
 
-        PublicCollections = publics.Select(c => new PublicCollectionVm(c.Id, c.Name, followedIds.Contains(c.Id))).ToList();
+            var followedIds = await _db.CollectionFollows
+                .AsNoTracking()
+                .Where(f => f.UserId == user.Id)
+                .Select(f => f.CollectionId)
+                .ToListAsync();
+
+            PublicCollections = publics
+                .Select(c => new PublicCollectionVm(
+                    c.Id,
+                    c.Name,
+                    followedIds.Contains(c.Id)))
+                .ToList();
+        }
+        else
+        {
+            MyCollections = new();
+            PublicCollections = publics
+                .Select(c => new PublicCollectionVm(c.Id, c.Name, false))
+                .ToList();
+        }
     }
+
 
     [Authorize]
     public async Task<IActionResult> OnPostDeleteAsync(int id)

@@ -10,6 +10,55 @@ public class SearchService : ISearchService
 
     public SearchService(ApplicationDbContext db) => _db = db;
 
+    public async Task<List<ImageItem>> GetTrendingAsync(int take = 8)
+    {
+        return await _db.Images
+            .AsNoTracking()
+            .Include(i => i.Likes)
+            .Where(i =>
+                i.IsPublic &&
+                i.SafetyStatus == "Approved" &&
+                !i.IsDeleted)
+            .OrderByDescending(i => i.Likes.Count)
+            .Take(take)
+            .ToListAsync();
+    }
+
+    public async Task<List<ImageItem>> GetRecommendedAsync(string userId, int take = 8)
+    {
+        var tagIds = await _db.UserPreferenceTags
+            .AsNoTracking()
+            .Where(p => p.UserId == userId)
+            .OrderByDescending(p => p.Weight)
+            .Select(p => p.TagId)
+            .Take(10)
+            .ToListAsync();
+
+        if (!tagIds.Any())
+            return await GetTrendingAsync(take);
+
+        return await _db.Images
+            .AsNoTracking()
+            .Include(i => i.ImageTags)
+            .ThenInclude(it => it.Tag)
+            .Where(i =>
+                i.IsPublic &&
+                i.SafetyStatus == "Approved" &&
+                !i.IsDeleted &&
+                i.ImageTags.Any(it => tagIds.Contains(it.TagId)))
+            .Take(take)
+            .ToListAsync();
+    }
+
+    public async Task<List<Tag>> GetPopularTagsAsync(int take = 12)
+    {
+        return await _db.Tags
+            .AsNoTracking()
+            .OrderByDescending(t => t.ImageTags.Count)
+            .Take(take)
+            .ToListAsync();
+    }
+
     public async Task<List<ImageItem>> SearchAsync(string? query, string? userId)
     {
         query ??= "";
@@ -20,7 +69,10 @@ public class SearchService : ISearchService
             .AsNoTracking()
             .Include(i => i.ImageTags).ThenInclude(it => it.Tag)
             .Include(i => i.Likes)
-            .Where(i => i.IsPublic && i.SafetyStatus == "Approved");
+            .Where(i =>
+                i.IsPublic &&
+                i.SafetyStatus == "Approved" &&
+                !i.IsDeleted);
 
         if (tokens.Count > 0)
         {
