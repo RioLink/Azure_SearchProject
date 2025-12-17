@@ -2,30 +2,49 @@
 @model Azure_SearchProject.Pages.Images.UploadModel
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 
+@{
+    ViewData["Title"] = "Upload image";
+}
+
 <h2>Upload image</h2>
 
 <form method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
     <div>
-        <label>File</label>
-        <input type="file" name="File" accept="image/*" required />
+        <label>File</label><br />
+        <input type="file" name="UploadFile" />
     </div>
+
+    <br />
+
     <div>
-        <label>Title</label>
+        <label>Title</label><br />
         <input type="text" name="Title" />
     </div>
+
+    <br />
+
     <div>
-        <label>Tags (comma separated)</label>
+        <label>Tags (comma separated)</label><br />
         <input type="text" name="Tags" placeholder="nature, city, tech" />
     </div>
+
+    <br />
+
     <div>
-        <label>Public</label>
-        <input type="checkbox" name="IsPublic" checked />
+        <label>
+            <input type="checkbox" name="IsPublic" checked />
+            Public
+        </label>
     </div>
+
+    <br />
 
     <button type="submit">Upload</button>
 </form>
 
-@if (!string.IsNullOrWhiteSpace(Model.Message))
+@if (!string.IsNullOrEmpty(Model.Message))
 {
-    <p>@Model.Message</p>
+    <p style="color:red">@Model.Message</p>
 }

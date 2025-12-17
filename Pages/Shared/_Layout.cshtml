@@ -16,15 +16,8 @@
             <a asp-page="/Index">Home</a>
             <a asp-page="/Collections/Index">Collections</a>
 
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <a asp-page="/Images/Upload" class="btn-primary">Upload</a>
-                <a asp-page="/Account/Logout">Logout</a>
-            }
-            else
-            {
-                <a asp-page="/Account/Login">Login</a>
-            }
+            <partial name="_LoginPartial" />
+        </nav>
         </nav>
     </header>
 

@@ -1,4 +1,4 @@
-body {
+﻿body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     background: #f8fafc;
     color: #0f172a;
@@ -128,4 +128,96 @@ footer {
     margin-top: 60px;
     text-align: center;
     color: #64748b;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* 🔥 ПРОБЕЛЫ */
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.nav-link-primary {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #2563eb;
+    color: white;
+}
+
+    .nav-link-primary:hover {
+        background: #1e40af;
+    }
+
+.auth-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logout-form {
+    margin: 0;
+}
+
+.btn-logout {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    cursor: pointer;
+}
+
+    .btn-logout:hover {
+        background: #f3f4f6;
+    }
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.auth-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-link {
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    color: #2563eb;
+}
+
+    .nav-link:hover {
+        background: #eef2ff;
+    }
+
+    .nav-link.upload {
+        background: #2563eb;
+        color: white;
+    }
+
+        .nav-link.upload:hover {
+            background: #1d4ed8;
+        }
+
+.logout-form {
+    display: inline;
+}
+
+.nav-link.logout {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
 }

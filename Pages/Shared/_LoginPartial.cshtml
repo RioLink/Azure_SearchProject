@@ -1,14 +1,21 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
 
-@if (SignInManager.IsSignedIn(User))
-{
-    <span>Hello, @User.Identity?.Name!</span>
-    <a asp-area="Identity" asp-page="/Account/Logout">Logout</a>
-}
-else
-{
-    <a asp-area="Identity" asp-page="/Account/Login">Login</a>
-    <a asp-area="Identity" asp-page="/Account/Register">Register</a>
-}
+<div class="auth-links">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <a asp-page="/Images/Upload" class="nav-link upload">Upload</a>
+
+        <form asp-area="Identity"
+              asp-page="/Account/Logout"
+              method="post"
+              class="logout-form">
+            <button type="submit" class="nav-link logout">Logout</button>
+        </form>
+    }
+    else
+    {
+        <a asp-area="Identity" asp-page="/Account/Login" class="nav-link">Login</a>
+        <a asp-area="Identity" asp-page="/Account/Register" class="nav-link">Register</a>
+    }
+</div>
